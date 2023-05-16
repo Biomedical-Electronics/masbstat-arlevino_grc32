@@ -14,7 +14,7 @@
 void PMU_init(void) {
 
 	HAL_GPIO_WritePin(EN_GPIO_Port, EN_Pin, GPIO_PIN_SET); // EN = 1
-
+	HAL_Delay(500); // wait 500ms
 }
 
 //Function to end the PMU ( EN = 0 )
