@@ -35,7 +35,7 @@ void make_CA(struct CA_Configuration_S caConfiguration){
 
 	//Funcion ISR del timer del archivo del Leva que cambia una variable a True
 	//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-	while (time_counter < measurementTimeMs)
+	while (time_counter < measurementTimeMs){
 		if (timer){ //if timer is True (samplingperiodMs has passed)
 			timer = FALSE; //set the variable at false again so the loop wont happen forever
 
@@ -59,6 +59,6 @@ void make_CA(struct CA_Configuration_S caConfiguration){
 			//poner un if que mire el tiempo transcurrido y si es mayor a
 			//measurementTime, break;
 		}
-
+	}
 
 }
