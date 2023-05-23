@@ -21,6 +21,9 @@ struct CA_Configuration_S {
 
 };
 
+
+void make_CA(struct CA_Configuration_S caConfiguration);
+
 #endif /* INC_COMPONENTS_CHRONOAMPEROMETRY_H_ */
 
 
