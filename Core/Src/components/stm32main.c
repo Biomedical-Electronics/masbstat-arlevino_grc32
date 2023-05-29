@@ -13,6 +13,8 @@ struct CV_Configuration_S cvConfiguration;
 struct CA_Configuration_S caConfiguration;
 struct Data_S data;
 
+volatile _Bool stop = FALSE;
+
 MCP4725_Handle_T hdac = NULL;
 
 void setup(struct Handles_S *handles) {
@@ -86,6 +88,7 @@ void loop(void) {
  				__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
 
  				// Aqui iria el codigo para tener la medicion si implementais el comando stop.
+ 				stop = TRUE;
 
  				break;
 
