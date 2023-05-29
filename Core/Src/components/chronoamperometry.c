@@ -14,6 +14,7 @@
 volatile _Bool timer = FALSE;
 //extern volatile _Bool timer ,en archivo timer
 extern MCP4725_Handle_T hdac;
+extern volatile _Bool stop;
 
 void make_CA(struct CA_Configuration_S caConfiguration){
 
@@ -36,6 +37,9 @@ void make_CA(struct CA_Configuration_S caConfiguration){
 	//Funcion ISR del timer del archivo del Leva que cambia una variable a True
 	//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	while (time_counter < measurementTimeMs){
+		if (stop) { //if stop is True (measuring must stop)
+			break
+		}
 		if (timer){ //if timer is True (samplingperiodMs has passed)
 			timer = FALSE; //set the variable at false again so the loop wont happen forever
 
@@ -55,9 +59,6 @@ void make_CA(struct CA_Configuration_S caConfiguration){
 			data.current = Icell;
 
 			MASB_COMM_S_sendData(data);
-
-			//poner un if que mire el tiempo transcurrido y si es mayor a
-			//measurementTime, break;
 		}
 	}
 
