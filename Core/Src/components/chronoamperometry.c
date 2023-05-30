@@ -22,13 +22,11 @@ static uint32_t time_counter = 0;
 static struct CA_Configuration_S prvCaConfiguration;
 
 void CA_init(struct CA_Configuration_S caConfiguration){
-	prvCaConfiguration = caConfiguration;
 
+	prvCaConfiguration = caConfiguration; //obtain the received variables
+	estado = CA; //change measuring state to CA
 
-	// extract the 3 variables from the input structure
-	//eDC = prvCaConfiguration.eDC;
-	//samplingPeriodMs = prvCaConfiguration.samplingPeriodMs;
-	//measurementTimeMs = prvCaConfiguration.measurementTime*1000;
+	set_up_Timer(prvCaConfiguration.samplingPeriodMs); //initialise timer
 
 	// set Vcell to eDC
 	MCP4725_SetOutputVoltage(hdac, calculateDacOutputVoltage(prvCaConfiguration.eDC));
@@ -46,16 +44,14 @@ void make_CA(void){
 		HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
 
 		//Stop timer
-		//poner que la variable timer sea FALSE a parte de para el timer
+		stop_Timer();
 
 	}else if (timer){ //if timer is True (samplingperiodMs has passed)
 		timer = FALSE; //set the variable at false again so the loop wont happen forever
 
 		//medir Vcell(real) i Icell
-		//para medir Vcell llamaremos a la funcion que cree el Leva con ADCs
-
-		//Icell. No se que input hay que poner en la funcion
-		Icell = calculateIcellCurrent(adcValue);
+		Vcell = get_Vcell();
+		Icell = get_Icell();
 
 		//enviar datos al Host
 		time_counter = (point+1)*prvCaConfiguration.samplingPeriodMs; //cutre, preguntar si se hace asi
