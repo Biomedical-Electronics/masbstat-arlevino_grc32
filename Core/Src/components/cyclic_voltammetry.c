@@ -11,66 +11,126 @@
 #include "components/formulas.h"
 #include "components/mcp4725_driver.h"
 
-volatile _Bool timer = FALSE;
+extern volatile _Bool timer;
 extern MCP4725_Handle_T hdac;
+extern volatile enum Estado estado;
 
+static struct CV_Configuration_S prvCvConfiguration;
 
-void make_CV(struct CV_configuration_S CV_config) {
+static uint32_t point = 0;
+static uint32_t time_counter = 0;
+uint32_t samplingPeriodMs;
+int8_t sign_eStep = 1;
 
-	uint32_t point = 0;
-	uint32_t time_counter = 0;
+void CV_init(struct CV_Configuration_S cvConfiguration){
 
-	//Extract the CV parameters from the input structure
-	double eBegin = CV_config.eBegin;
-	double eVertex1 = CV_config.eVertex1;
-	double eVertex2 = CV_config.eVertex2;
-	uint8_t cycles = CV_config.cycles;
-	double scanRate = CV_config.scanRate;
-	double eStep = CV_config.eStep;
-
+	prvCvConfiguration = cvConfiguration;
+	estado = CV;
 	//set the desired voltage of Vcell to eBegin using the DAC
-	MCP4725_SetOutputVoltage(hdac, calculateDacOutputVoltage(eBegin));
+	VCELL = calculateDacOutputVoltage(prvCvConfiguration.eBegin); // distinguish from Vcell, this one refers to DAC
+	MCP4725_SetOutputVoltage(hdac, VCELL);
 
 	//set the objective voltage to eVertex1
-	vObjective = eVertex;
+	vObjective = prvCvConfiguration.eVertex1;
+
+	if (eVertex1 < eBegin) {
+
+		sign_eStep = -1;
+
+	}
 
 	//close reley -> Set RELAY GPIO to 1
 	HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_SET); // RELAY = 1
 
 	//define the sampling period -> time at which the timer must trigger the ISR to toggle "timer"
-	samplingPeriodMs = eStep / scanRate;
+	samplingPeriodMs = prvCvConfiguration.eStep*1000 / prvCvConfiguration.scanRate;
 
-	__HAL_TIM_SET_AUTORELOAD(&htim2, samplingPeriodMs);
+	set_up_Timer(samplingPeriodMs);//initializate timer
 
-	//Funcion ISR del timer del archivo del Leva que cambia una variable a True
-	//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+}
 
-	//conduct the measures after every sampling period
-	while (time_counter < measurementTimeMs){
-		if(timer){ //if timer is True (samplingperiodMs has passed)
+
+
+void make_CV(struct CV_configuration_S CV_config) {
+
+	uint16_t n_cycles = 0; //cycle counter
+
+	if (n_cycles >= prvCvConfiguration.cycles){
+			estado = IDLE;
+
+			//Open Relay
+			HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
+
+			//Stop timer
+			stop_Timer();
+
+	}else if (timer){ //if timer is True (samplingperiodMs has passed)
 			timer = FALSE; //set the variable at false again so the loop wont happen forever
 
 			//medir Vcell(real) i Icell
-			//para medir Vcell llamaremos a la funcion que cree el Leva con ADCs
+			Vcell = get_Vcell();
+			Icell = get_Icell();
 
-			Icell = calculateIcellCurrent(adcValue);
+			//enviar datos al Host
+			time_counter = (point+1)*samplingPeriodMs; //cutre, preguntar si se hace asi
+			point++; //se tiene que definir como uint32_t en algun lado, preguntar al albert
 
-			//send data to host -> time and value
-			time_counter = (point+1)*samplingPeriodMs;
-			point++;
 			data.point = point;
 			data.timeMs = time_counter;
 			data.voltage = Vcell;
 			data.current = Icell;
+
 			MASB_COMM_S_sendData(data);
+
+			//assess whether I have reached vobjective
+
+			if (VCELL == vObjective) {
+
+				if (vObjective == prvCvConfiguration.eVertex1) {
+
+					sign_eStep = - sign_eStep;
+					vObjective = prvCvConfiguration.eVertex2;
+
+
+				}else if (vObjective == prvCvConfiguration.eVertex2) {
+
+					sign_eStep = - sign_eStep;
+					vObjective = prvCvConfiguration.eBegin;
+					n_cycles ++;
+
+				}else if (n_cycles == prvCvConfiguration.cycles) {
+
+					estado = IDLE;
+
+					//Open Relay
+					HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
+
+					//Stop timer
+					stop_Timer();
+
+				}else {
+
+					vObjective = prvCvConfiguration.eVertex1;
+				}
+
+			}else{
+
+				//assess whether the next step will be the last one (implemented for both directions with sign_eStep)
+				if (sign_eStep*(VCELL + sign_eStep*prvCvConfiguration.eStep) > sign_eStep*vObjective){
+
+					//set VCELL to vObjective
+					VCELL = calculateDacOutputVoltage(vObjective);
+					MCP4725_SetOutputVoltage(hdac, VCELL);
+
+
+				}else {
+
+					//update VCELL with the positive/negative step
+					VCELL = VCELL + sign_eStep*prvCvConfiguration.eStep;
+				}
+
+			}
 
 
 		}
 	}
-
-
-
-
-
-
-}
