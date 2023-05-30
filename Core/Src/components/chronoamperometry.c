@@ -62,4 +62,7 @@ void make_CA(struct CA_Configuration_S caConfiguration){
 		}
 	}
 
+	//Open Relay
+	HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
+
 }
