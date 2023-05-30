@@ -11,58 +11,62 @@
 #include "components/mcp4725_driver.h"
 #include "components/chronoamperometry.h"
 
-volatile _Bool timer = FALSE;
-//extern volatile _Bool timer ,en archivo timer
+extern volatile _Bool timer;
 extern MCP4725_Handle_T hdac;
 extern volatile _Bool stop;
+extern volatile enum Estado estado;
 
-void make_CA(struct CA_Configuration_S caConfiguration){
+static uint32_t point = 0;
+static uint32_t time_counter = 0;
 
-	uint32_t point = 0;
-	uint32_t time_counter = 0;
+static struct CA_Configuration_S prvCaConfiguration;
+
+void CA_init(struct CA_Configuration_S caConfiguration){
+	prvCaConfiguration = caConfiguration;
+
+
 	// extract the 3 variables from the input structure
-	eDC = caConfiguration.eDC;
-	samplingPeriodMs = caConfiguration.samplingPeriodMs;
-	measurementTimeMs = caConfiguration.measurementTime*1000;
+	//eDC = prvCaConfiguration.eDC;
+	//samplingPeriodMs = prvCaConfiguration.samplingPeriodMs;
+	//measurementTimeMs = prvCaConfiguration.measurementTime*1000;
 
 	// set Vcell to eDC
-	MCP4725_SetOutputVoltage(hdac, calculateDacOutputVoltage(eDC));
+	MCP4725_SetOutputVoltage(hdac, calculateDacOutputVoltage(prvCaConfiguration.eDC));
 
 	//Close Relay
 	HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_SET);
+}
 
-	//set the time at which the timer will execute the ISR
-	__HAL_TIM_SET_AUTORELOAD(&htim2, samplingPeriodMs);
+void make_CA(void){
 
-	//Funcion ISR del timer del archivo del Leva que cambia una variable a True
-	//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-	while (time_counter < measurementTimeMs){
-		if (stop) { //if stop is True (measuring must stop)
-			break
-		}
-		if (timer){ //if timer is True (samplingperiodMs has passed)
-			timer = FALSE; //set the variable at false again so the loop wont happen forever
+	if (time_counter >= prvCaConfiguration.measurementTime*1000){
+		estado = IDLE;
 
-			//medir Vcell(real) i Icell
-			//para medir Vcell llamaremos a la funcion que cree el Leva con ADCs
+		//Open Relay
+		HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
 
-			//Icell. No se que input hay que poner en la funcion
-			Icell = calculateIcellCurrent(adcValue);
+		//Stop timer
+		//poner que la variable timer sea FALSE a parte de para el timer
 
-			//enviar datos al Host
-			time_counter = (point+1)*samplingPeriodMs; //cutre, preguntar si se hace asi
-			point++; //se tiene que definir como uint32_t en algun lado, preguntar al albert
+	}else if (timer){ //if timer is True (samplingperiodMs has passed)
+		timer = FALSE; //set the variable at false again so the loop wont happen forever
 
-			data.point = point;
-			data.timeMs = time_counter;
-			data.voltage = Vcell;
-			data.current = Icell;
+		//medir Vcell(real) i Icell
+		//para medir Vcell llamaremos a la funcion que cree el Leva con ADCs
 
-			MASB_COMM_S_sendData(data);
-		}
+		//Icell. No se que input hay que poner en la funcion
+		Icell = calculateIcellCurrent(adcValue);
+
+		//enviar datos al Host
+		time_counter = (point+1)*prvCaConfiguration.samplingPeriodMs; //cutre, preguntar si se hace asi
+		point++; //se tiene que definir como uint32_t en algun lado, preguntar al albert
+
+		data.point = point;
+		data.timeMs = time_counter;
+		data.voltage = Vcell;
+		data.current = Icell;
+
+		MASB_COMM_S_sendData(data);
 	}
-
-	//Open Relay
-	HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
 
 }
