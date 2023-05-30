@@ -10,5 +10,7 @@
 
 
 void set_up_Timer(double samplingPeriodMs);
+void stop_Timer(void);
+
 
 #endif /* INC_COMPONENTS_TIMER_H_ */
