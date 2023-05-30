@@ -13,7 +13,7 @@ struct CV_Configuration_S cvConfiguration;
 struct CA_Configuration_S caConfiguration;
 struct Data_S data;
 
-volatile _Bool stop = FALSE;
+volatile enum Estado{IDLE = 0, CV, CA}estado;
 
 MCP4725_Handle_T hdac = NULL;
 
@@ -61,7 +61,7 @@ void loop(void) {
                  // la guardamos en la variable cvConfiguration
 				cvConfiguration = MASB_COMM_S_getCvConfiguration();
 
- 				make_CV(cvConfiguration);
+ 				CV_init(cvConfiguration);
 
  				__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
 
@@ -76,7 +76,7 @@ void loop(void) {
  				// la guardamos en la variable caConfiguration
  				caConfiguration = MASB_COMM_S_getCaConfiguration();
 
- 				make_CA(caConfiguration);
+ 				CA_init(caConfiguration);
 
  			 	__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
 
@@ -88,7 +88,13 @@ void loop(void) {
  				__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
 
  				// Aqui iria el codigo para tener la medicion si implementais el comando stop.
- 				stop = TRUE;
+
+ 				//stop the timer
+ 				stop_Timer();
+ 				//Change enum variable to IDLE
+ 				estado = IDLE;
+ 				//Open Relay
+ 				HAL_GPIO_WritePin(RELAY_GPIO_Port, RELAY_Pin, GPIO_PIN_RESET);
 
  				break;
 
@@ -103,8 +109,23 @@ void loop(void) {
 
  	}
 
- 	// Aqui es donde deberia de ir el codigo de control de las mediciones si se quiere implementar
-   // el comando de STOP.
-   //PMU_end();
+    switch(estado){
+
+    	case CV: //If we are measuring CV, read one point and send it
+
+    		make_CV();
+
+    		break;
+
+    	case CA: //If we are measuring CA, read one point and send it
+
+    		make_CA();
+
+    		break;
+
+    	case IDLE: // Do not do anything
+
+    		break;
+    }
 
 }
