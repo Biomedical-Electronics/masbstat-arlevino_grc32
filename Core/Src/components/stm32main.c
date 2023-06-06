@@ -11,7 +11,6 @@
 
 struct CV_Configuration_S cvConfiguration;
 struct CA_Configuration_S caConfiguration;
-struct Data_S data;
 
 volatile enum Estado{IDLE = 0, CV, CA}estado;
 
@@ -26,24 +25,24 @@ void setup(struct Handles_S *handles) {
 
 	hpot = AD5280_Init();
 
-	// Configuramos su direccion I2C de esclavo, su resistencia total (hay
-	// diferentes modelos; este tiene 50kohms) e indicamos que funcion queremos que
-	// se encargue de la escritura a traves del I2C. Utilizaremos la funcion
-	// I2C_Write de la libreria i2c_lib.
+	// We configure its slave I2C address, its total resistance (there are
+	// different models; this one has 50kohms) and we indicate which function we want it to
+	// be in charge of writing through the I2C. We will use the function
+	// I2C_Write from the i2c_lib library.
 	AD5280_ConfigSlaveAddress(hpot, 0x2C);
 	AD5280_ConfigNominalResistorValue(hpot, 50e3f);
 	AD5280_ConfigWriteFunction(hpot, I2C_write);
 
-	// Fijamos la resistencia de 50 kohms.
+	// We set the resistance to 50 kOhm.
 	AD5280_SetWBResistance(hpot, 50e3f);
 
-	// Declarar esta variable como global para poder
-	// acceder a ella desde diferentes archivos
+	// Declare this variable as a global variable in order to be able to
+	// access it from different archives
 
 	hdac = MCP4725_Init();
-	MCP4725_ConfigSlaveAddress(hdac, 0x66); // DIRECCION DEL ESCLAVO
-	MCP4725_ConfigVoltageReference(hdac, 4.0f); // TENSION DE REFERENCIA
-	MCP4725_ConfigWriteFunction(hdac, I2C_write); // FUNCION DE ESCRITURA (libreria I2C_lib)
+	MCP4725_ConfigSlaveAddress(hdac, 0x66); // SLAVE ADDRESS
+	MCP4725_ConfigVoltageReference(hdac, 4.0f); // REFERENCE VOLTAGE
+	MCP4725_ConfigWriteFunction(hdac, I2C_write); // WRITING FUNCTION (I2C_lib library)
 
     MASB_COMM_S_setUart(handles->huart);
     MASB_COMM_S_waitForMessage();
@@ -51,43 +50,32 @@ void setup(struct Handles_S *handles) {
 
 
 void loop(void) {
-    if (MASB_COMM_S_dataReceived()) { // Si se ha recibido un mensaje...
+    if (MASB_COMM_S_dataReceived()) { // If a message has been received...
 
- 		switch(MASB_COMM_S_command()) { // Miramos que comando hemos recibido
+ 		switch(MASB_COMM_S_command()) { // We look at what command we have received
 
- 			case START_CV_MEAS: // Si hemos recibido START_CV_MEAS
+ 			case START_CV_MEAS: // If we have received START_CV_MEAS
 
-                 // Leemos la configuracion que se nos ha enviado en el mensaje y
-                 // la guardamos en la variable cvConfiguration
+                 // We read the configuration that has been sent to us in the message and
+                 // we store it in the variable cvConfiguration
 				cvConfiguration = MASB_COMM_S_getCvConfiguration();
 
  				CV_init(cvConfiguration);
 
- 				__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
-
- 				// Aqui iria todo el codigo de gestion de la medicion que hareis en el proyecto
-                // si no quereis implementar el comando de stop.
-
  				break;
 
- 			case START_CA_MEAS: // Si hemos recibido START_CA_MEAS
+ 			case START_CA_MEAS: // If we have received START_CA_MEAS
 
- 				// Leemos la configuracion que se nos ha enviado en el mensaje y
- 				// la guardamos en la variable caConfiguration
+                // We read the configuration that has been sent to us in the message and
+                 // we store it in the variable caConfiguration
  				caConfiguration = MASB_COMM_S_getCaConfiguration();
 
  				CA_init(caConfiguration);
 
- 			 	__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
-
 
  			 	break;
 
-			case STOP_MEAS: // Si hemos recibido STOP_MEAS
-
- 				__NOP(); // Esta instruccion no hace nada y solo sirve para poder anadir un breakpoint
-
- 				// Aqui iria el codigo para tener la medicion si implementais el comando stop.
+			case STOP_MEAS: // If we have received STOP_MEAS
 
  				//stop the timer
  				stop_Timer();
@@ -98,13 +86,13 @@ void loop(void) {
 
  				break;
 
- 			default: // En el caso que se envia un comando que no exista
+ 			default: // In the event that a command is sent which does not exist
 
  				break;
 
  		}
 
-       // Una vez procesado los comando, esperamos el siguiente
+       // Once the commands have been processed, we wait for the following
  		MASB_COMM_S_waitForMessage();
 
  	}
