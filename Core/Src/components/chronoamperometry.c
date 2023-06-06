@@ -20,6 +20,7 @@ static uint32_t point = 0;
 static uint32_t time_counter = 0;
 
 static struct CA_Configuration_S prvCaConfiguration;
+struct Data_S data;
 
 void CA_init(struct CA_Configuration_S caConfiguration){
 
@@ -54,8 +55,8 @@ void make_CA(void){
 		Icell = get_Icell();
 
 		//enviar datos al Host
-		time_counter = (point+1)*prvCaConfiguration.samplingPeriodMs; //cutre, preguntar si se hace asi
-		point++; //se tiene que definir como uint32_t en algun lado, preguntar al albert
+		point++;
+		time_counter = (point)*prvCaConfiguration.samplingPeriodMs;
 
 		data.point = point;
 		data.timeMs = time_counter;
