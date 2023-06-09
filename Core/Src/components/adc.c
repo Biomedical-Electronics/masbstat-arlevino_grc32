@@ -13,9 +13,15 @@ double get_Icell(void){
 	//config. to read Icell (PA0)
 	sConfig.Channel = ADC_CHANNEL_0; // Configure ADC channel for PA0
 	sConfig.Rank = 1; //set the rank to 1, to read first and uniquely Icell
+	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
 	HAL_ADC_ConfigChannel(&hadc1, &sConfig); //update the configuration
 
 	//get the ADC measure
+	HAL_ADC_Start(&hadc1); // init adc
 	HAL_ADC_PollForConversion(&hadc1, 200);// wait the conversion to end
 	adc_Icell = HAL_ADC_GetValue(&hadc1);
 	Icell = calculateIcellCurrent(adc_Icell);
@@ -29,9 +35,15 @@ double get_Vcell(void){
 	//config. to read Vcell (PA1)
 	sConfig.Channel = ADC_CHANNEL_1; // Configure ADC channel for PA1
 	sConfig.Rank = 1; //set the rank to 1, to read first and uniquely Vcell
+	sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
 	HAL_ADC_ConfigChannel(&hadc1, &sConfig); //update the configuration
 
 	//get the ADC measure
+	HAL_ADC_Start(&hadc1); // init adc
 	HAL_ADC_PollForConversion(&hadc1, 200);// wait the conversion to end
 	adc_Vcell = HAL_ADC_GetValue(&hadc1);
 	Vcell = calculateVrefVoltage(adc_Vcell);
