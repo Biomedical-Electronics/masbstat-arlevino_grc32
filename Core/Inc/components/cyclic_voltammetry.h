@@ -24,4 +24,7 @@ struct CV_Configuration_S {
 
 };
 
+void CV_init(struct CV_Configuration_S cvConfiguration);
+void make_CV(void);
+
 #endif /* INC_COMPONENTS_CYCLIC_VOLTAMMETRY_H_ */

@@ -16,6 +16,7 @@ extern MCP4725_Handle_T hdac;
 extern volatile enum Estado estado;
 
 static struct CV_Configuration_S prvCvConfiguration;
+struct Data_S data;
 
 static uint32_t point = 0;
 static uint32_t time_counter = 0;
@@ -24,10 +25,11 @@ int8_t sign_eStep = 1;
 
 void CV_init(struct CV_Configuration_S cvConfiguration){
 
+	uint16_t n_cycles = 1; //init cycle counter
 	prvCvConfiguration = cvConfiguration;
 	estado = CV;
 	//set the desired voltage of Vcell to eBegin using the DAC
-	VCELL = calculateDacOutputVoltage(prvCvConfiguration.eBegin); // distinguish from Vcell, this one refers to DAC
+	VCELL = calculateDacOutputVoltage(prvCvConfiguration.eBegin); // distinguish from Vcell_real, this one refers to DAC
 	MCP4725_SetOutputVoltage(hdac, VCELL);
 
 	//set the objective voltage to eVertex1
@@ -51,9 +53,8 @@ void CV_init(struct CV_Configuration_S cvConfiguration){
 
 
 
-void make_CV(struct CV_configuration_S CV_config) {
+void make_CV(void) {
 
-	uint16_t n_cycles = 0; //cycle counter
 
 	if (n_cycles >= prvCvConfiguration.cycles){
 			estado = IDLE;
@@ -68,7 +69,7 @@ void make_CV(struct CV_configuration_S CV_config) {
 			timer = FALSE; //set the variable at false again so the loop wont happen forever
 
 			//medir Vcell(real) i Icell
-			Vcell = get_Vcell();
+			Vcell_real = get_Vcell();
 			Icell = get_Icell();
 
 			//enviar datos al Host
@@ -77,28 +78,27 @@ void make_CV(struct CV_configuration_S CV_config) {
 
 			data.point = point;
 			data.timeMs = time_counter;
-			data.voltage = Vcell;
+			data.voltage = Vcell_real;
 			data.current = Icell;
 
 			MASB_COMM_S_sendData(data);
 
 			//assess whether I have reached vobjective
 
-			if (VCELL == vObjective) {
+			if (abs(VCELL - vObjective)< 10^(-5) ) {
 
-				if (vObjective == prvCvConfiguration.eVertex1) {
+				if (abs(vObjective - prvCvConfiguration.eVertex1) < 10^(-5)) {
 
 					sign_eStep = - sign_eStep;
 					vObjective = prvCvConfiguration.eVertex2;
 
 
-				}else if (vObjective == prvCvConfiguration.eVertex2) {
+				}else if (abs(vObjective - prvCvConfiguration.eVertex2)< 10^(-5)) {
 
 					sign_eStep = - sign_eStep;
 					vObjective = prvCvConfiguration.eBegin;
-					n_cycles ++;
 
-				}else if (n_cycles == prvCvConfiguration.cycles) {
+				}else if (abs(n_cycles - prvCvConfiguration.cycles)< 10^(-5)) {
 
 					estado = IDLE;
 
@@ -109,7 +109,7 @@ void make_CV(struct CV_configuration_S CV_config) {
 					stop_Timer();
 
 				}else {
-
+					n_cycles ++;
 					vObjective = prvCvConfiguration.eVertex1;
 				}
 
