@@ -11,7 +11,7 @@ volatile _Bool timer;
 
 
 void set_up_Timer(uint32_t samplingPeriodMs){
-
+	timer = FALSE;
 	__HAL_TIM_SET_COUNTER(&htim2, 0); //set counter to 0
 	__HAL_TIM_SET_AUTORELOAD(&htim2, samplingPeriodMs); //set the counter samplingPeriod
 	HAL_TIM_Base_Start_IT(&htim2);
