@@ -8,7 +8,12 @@
 #include "components/stm32main.h"
 #include "components/masb_comm_s.h"
 #include "components/PMU.h"
+#include "components/mcp4725_driver.h"
+#include "components/ad5280_driver.h"
+#include "components/i2c_lib.h"
+#include "components/timer.h"
 
+uint32_t counter = 0;
 struct CV_Configuration_S cvConfiguration;
 struct CA_Configuration_S caConfiguration;
 
@@ -16,10 +21,12 @@ volatile enum Estado{IDLE = 0, CV, CA}estado;
 
 MCP4725_Handle_T hdac = NULL;
 
+extern struct Handles_S myHandles;
+
 void setup(struct Handles_S *handles) {
 	PMU_init();
 
-	I2C_init(&hi2c1);
+	I2C_init(handles->hi2c);
 
 	AD5280_Handle_T hpot = NULL;
 
@@ -46,6 +53,7 @@ void setup(struct Handles_S *handles) {
 
     MASB_COMM_S_setUart(handles->huart);
     MASB_COMM_S_waitForMessage();
+
 }
 
 
@@ -97,7 +105,9 @@ void loop(void) {
 
  	}
 
+
     switch(estado){
+
 
     	case CV: //If we are measuring CV, read one point and send it
 

@@ -9,7 +9,7 @@
 #define INC_COMPONENTS_TIMER_H_
 
 
-void set_up_Timer(double samplingPeriodMs);
+void set_up_Timer(uint32_t samplingPeriodMs);
 void stop_Timer(void);
 
 

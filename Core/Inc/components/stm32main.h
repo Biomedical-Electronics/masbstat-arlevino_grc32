@@ -17,6 +17,7 @@ struct Handles_S {
      UART_HandleTypeDef *huart;
 };
 
+
 // Prototypes.
 void setup(struct Handles_S *handles);
 void loop(void);

@@ -9,6 +9,7 @@
  */
 
 #include "components/PMU.h"
+#include "main.h"
 
 //Function to initialize the PMU ( EN = 1 )
 void PMU_init(void) {

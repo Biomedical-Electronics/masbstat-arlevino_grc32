@@ -10,17 +10,23 @@
 #include "components/formulas.h"
 #include "components/mcp4725_driver.h"
 #include "components/chronoamperometry.h"
+#include "components/timer.h"
+#include "components/adc.h"
+#include "main.h"
 
 extern volatile _Bool timer;
 extern MCP4725_Handle_T hdac;
 extern volatile _Bool stop;
-extern volatile enum Estado estado;
+extern volatile enum Estado{IDLE, CV, CA} estado;
 
-static uint32_t point = 0;
+uint32_t point_ca = 0;
 static uint32_t time_counter = 0;
 
 static struct CA_Configuration_S prvCaConfiguration;
-struct Data_S data;
+extern struct Data_S data;
+
+double Vcell_ca;
+double Icell_ca;
 
 void CA_init(struct CA_Configuration_S caConfiguration){
 
@@ -38,6 +44,7 @@ void CA_init(struct CA_Configuration_S caConfiguration){
 
 void make_CA(void){
 
+
 	if (time_counter >= prvCaConfiguration.measurementTime*1000){
 		estado = IDLE;
 
@@ -48,20 +55,24 @@ void make_CA(void){
 		stop_Timer();
 
 	}else if (timer){ //if timer is True (samplingperiodMs has passed)
+
 		timer = FALSE; //set the variable at false again so the loop wont happen forever
 
 		//medir Vcell(real) i Icell
-		Vcell = get_Vcell();
-		Icell = get_Icell();
+		Vcell_ca = get_Vcell();
+		Icell_ca = get_Icell();
 
 		//enviar datos al Host
-		point++;
-		time_counter = (point)*prvCaConfiguration.samplingPeriodMs;
+		point_ca++;
+		time_counter = (point_ca)*prvCaConfiguration.samplingPeriodMs;
 
-		data.point = point;
+		if (point_ca == 2){
+			__NOP();
+		}
+		data.point = point_ca;
 		data.timeMs = time_counter;
-		data.voltage = Vcell;
-		data.current = Icell;
+		data.voltage = Vcell_ca;
+		data.current = Icell_ca;
 
 		MASB_COMM_S_sendData(data);
 	}

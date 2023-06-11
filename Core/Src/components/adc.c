@@ -7,6 +7,21 @@
 
 #include "components/stm32main.h"
 #include "components/formulas.h"
+#include "components/masb_comm_s.h"
+#include "components/mcp4725_driver.h"
+#include "components/chronoamperometry.h"
+#include "components/timer.h"
+#include "main.h"
+
+ADC_ChannelConfTypeDef sConfig;
+extern ADC_HandleTypeDef hadc1;
+
+double adc_Vcell;
+double Vcell;
+double adc_Icell;
+double Icell;
+
+//extern struct Handles_S handles;
 
 double get_Icell(void){
 
@@ -27,7 +42,6 @@ double get_Icell(void){
 	Icell = calculateIcellCurrent(adc_Icell);
 
 	return  Icell;
-
 }
 
 double get_Vcell(void){
