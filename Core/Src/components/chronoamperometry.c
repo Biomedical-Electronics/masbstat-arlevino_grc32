@@ -66,9 +66,6 @@ void make_CA(void){
 		point_ca++;
 		time_counter = (point_ca)*prvCaConfiguration.samplingPeriodMs;
 
-		if (point_ca == 2){
-			__NOP();
-		}
 		data.point = point_ca;
 		data.timeMs = time_counter;
 		data.voltage = Vcell_ca;

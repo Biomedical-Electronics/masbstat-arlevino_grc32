@@ -32,7 +32,7 @@ double Vcell_real_cv;
 double Icell_cv;
 double theor_v;
 
-uint16_t n_cycles;
+uint8_t n_cycles;
 
 struct Handles_S myHandles;
 
@@ -43,8 +43,8 @@ void CV_init(struct CV_Configuration_S cvConfiguration){
 	estado = CV;
 	//set the desired voltage of Vcell to eBegin using the DAC
 	theor_v = prvCvConfiguration.eBegin;
-	VCELL_cv = calculateDacOutputVoltage(theor_v); // distinguish from Vcell_real, this one refers to DAC
-	MCP4725_SetOutputVoltage(hdac, VCELL_cv);
+	//VCELL_cv = ; // distinguish from Vcell_real, this one refers to DAC
+	MCP4725_SetOutputVoltage(hdac, calculateDacOutputVoltage(theor_v));
 
 	//set the objective voltage to eVertex1
 	vObjective = prvCvConfiguration.eVertex1;
@@ -82,27 +82,28 @@ void make_CV(void) {
 
 			data.point = point;
 			data.timeMs = time_counter;
-			data.voltage = Vcell_real_cv;
+			//data.voltage = Vcell_real_cv;
+			data.voltage = theor_v;
 			data.current = Icell_cv;
 
 			MASB_COMM_S_sendData(data);
 
 			//assess whether I have reached vobjective
+			//abs(theor_v - vObjective)< (10^(-2))
+			if (theor_v == vObjective) {
 
-			if (abs(theor_v - vObjective)< (10^(-5))) {
-
-				if (abs(vObjective - prvCvConfiguration.eVertex1) < (10^(-5))) {
+				if (vObjective == prvCvConfiguration.eVertex1) {
 
 					sign_eStep = - sign_eStep;
 					vObjective = prvCvConfiguration.eVertex2;
 
 
-				}else if (abs(vObjective - prvCvConfiguration.eVertex2)< (10^(-5))) {
+				}else if (vObjective == prvCvConfiguration.eVertex2) {
 
 					sign_eStep = - sign_eStep;
 					vObjective = prvCvConfiguration.eBegin;
 
-				}else if (abs(n_cycles - prvCvConfiguration.cycles)< (10^(-5))) {
+				}else if (n_cycles == prvCvConfiguration.cycles) {
 
 					estado = IDLE;
 
@@ -120,14 +121,15 @@ void make_CV(void) {
 			}else{
 
 				//assess whether the next step will be the last one (implemented for both directions with sign_eStep)
-				if (sign_eStep*(theor_v + sign_eStep*prvCvConfiguration.eStep) > sign_eStep*vObjective){
+				if ((sign_eStep*(theor_v + sign_eStep*prvCvConfiguration.eStep)) > (sign_eStep*vObjective)){
 
 					//set VCELL to vObjective
-					VCELL_cv = calculateDacOutputVoltage(vObjective);
+					theor_v = vObjective;
+					VCELL_cv = calculateDacOutputVoltage(theor_v);
 					MCP4725_SetOutputVoltage(hdac, VCELL_cv);
 
 
-				}else {
+				}else{
 
 					//update VCELL with the positive/negative step
 					theor_v = theor_v + sign_eStep*prvCvConfiguration.eStep;
@@ -138,6 +140,6 @@ void make_CV(void) {
 
 			}
 
-
 		}
+
 	}

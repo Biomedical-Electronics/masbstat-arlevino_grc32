@@ -16,9 +16,9 @@
 ADC_ChannelConfTypeDef sConfig;
 extern ADC_HandleTypeDef hadc1;
 
-double adc_Vcell;
+uint32_t adc_Vcell;
 double Vcell;
-double adc_Icell;
+uint32_t adc_Icell;
 double Icell;
 
 //extern struct Handles_S handles;
