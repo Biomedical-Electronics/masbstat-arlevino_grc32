@@ -12,7 +12,7 @@ double calculateVrefVoltage(uint32_t adcValue);
 double calculateIcellCurrent(uint32_t adcValue);
 
 // Se le pasa el valor de tension deseado entre WE y RE y devuelve el valor
-// que hay que darle a la funcion MCP4725_SetOutputVoltage
+// que hay que darle a la funcion MCP4725_SetOutputVoltage //
 float calculateDacOutputVoltage(double desiredVrefVoltage);
 
 #endif /* INC_COMPONENTS_STM32F4XX_ADC_H_ */
