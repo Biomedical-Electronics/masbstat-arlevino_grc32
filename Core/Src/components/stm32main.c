@@ -21,7 +21,6 @@ volatile enum Estado{IDLE = 0, CV, CA}estado;
 
 MCP4725_Handle_T hdac = NULL;
 
-extern struct Handles_S myHandles;
 
 void setup(struct Handles_S *handles) {
 	PMU_init();

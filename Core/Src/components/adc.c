@@ -39,6 +39,7 @@ double get_Icell(void){
 	HAL_ADC_Start(&hadc1); // init adc
 	HAL_ADC_PollForConversion(&hadc1, 200);// wait the conversion to end
 	adc_Icell = HAL_ADC_GetValue(&hadc1);
+
 	Icell = calculateIcellCurrent(adc_Icell);
 
 	return  Icell;

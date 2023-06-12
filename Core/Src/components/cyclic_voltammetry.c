@@ -14,6 +14,7 @@
 #include "components/adc.h"
 
 extern volatile _Bool timer;
+extern ADC_HandleTypeDef hadc1;
 extern MCP4725_Handle_T hdac;
 extern volatile enum Estado{IDLE, CV, CA} estado;
 
@@ -43,7 +44,6 @@ void CV_init(struct CV_Configuration_S cvConfiguration){
 	estado = CV;
 	//set the desired voltage of Vcell to eBegin using the DAC
 	theor_v = prvCvConfiguration.eBegin;
-	//VCELL_cv = ; // distinguish from Vcell_real, this one refers to DAC
 	MCP4725_SetOutputVoltage(hdac, calculateDacOutputVoltage(theor_v));
 
 	//set the objective voltage to eVertex1
@@ -82,14 +82,12 @@ void make_CV(void) {
 
 			data.point = point;
 			data.timeMs = time_counter;
-			//data.voltage = Vcell_real_cv;
-			data.voltage = theor_v;
+			data.voltage = Vcell_real_cv;
 			data.current = Icell_cv;
 
 			MASB_COMM_S_sendData(data);
 
-			//assess whether I have reached vobjective
-			//abs(theor_v - vObjective)< (10^(-2))
+			//assess whether I have reached vObjective
 			if (theor_v == vObjective) {
 
 				if (vObjective == prvCvConfiguration.eVertex1) {
