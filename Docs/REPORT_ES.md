@@ -4,11 +4,11 @@ students:
   - name: 'Álvaro Leva Ligero'
     email: 'levalvaro@gmail.com'
     linkedin: 'alvaroleva'
-    picture: 'Docs/assets/imgs/ALVARO-LEVA-LIGERO.jpg'
+    picture: 'assets/imgs/ALVARO-LEVA-LIGERO.jpg'
   - name: 'Guillermo Ruiz Carmona'
     email: 'guillermorc@gmail.com'
     linkedin: 'guillermo-ruiz-a665141a2'
-    picture: 'Docs/assets/imgs/GUILLERMO-RUIZ-CARMONA.jpg'
+    picture: 'assets/imgs/GUILLERMO-RUIZ-CARMONA.jpg'
 repo: 'https://github.com/Biomedical-Electronics/masbstat-arlevino_grc32'
 date: 2023-06-21
 language: 'es'
@@ -71,7 +71,7 @@ Los pines frontales del potenciostato, que se comunican con el microcontrolador,
 **[Cronoamperometría](https://en.wikipedia.org/wiki/Chronoamperometry)** utiliza un electrodo excitado por un potencial de tensión y es capaz de monitorizar las reacciones electroquímicas que tienen lugar en este electrodo como una corriente dependiente del tiempo.
 
 <p align='center'>
-<img src='Docs/assets/Chronoamperometry.jpg'>
+<img src='assets/Chronoamperometry.jpg'>
 </p>
 
 <p align="center">
@@ -87,7 +87,7 @@ La difusión del analito a través de la superficie del sensor afecta al modo en
 En una [voltamperometría cíclica](https://en.wikipedia.org/wiki/Cyclic_voltammetry), el potencial en el *electrodo de trabajo* cambia linealmente con el tiempo hasta un valor determinado, repitiendo este proceso múltiples ciclos. Finalmente, se produce un gráfico cíclico trazando la corriente del electrodo en función del potencial aplicado.
 
 <p align='center'>
-<img src='Docs/assets/Cyclovoltammogram.jpg'>
+<img src='assets/Cyclovoltammogram.jpg'>
 </p>
 
 <p align="center">
@@ -129,7 +129,7 @@ La [STM32F401 Nucleo-64](https://www.st.com/en/evaluation-tools/nucleo-f401re.ht
 
 
 <p align="center">
-<img src = "Docs/assets/EVB.png" width = 40%>
+<img src = "assets/EVB.png" width = 40%>
 </p>
 
 <p align="center">
@@ -146,7 +146,7 @@ La [STM32F401 Nucleo-64](https://www.st.com/en/evaluation-tools/nucleo-f401re.ht
 STM32Cube IDE es un entorno de desarrollo integrado (IDE) diseñado específicamente para programar y desarrollar aplicaciones para microcontroladores STM32. Proporciona una amplia gama de herramientas, funciones y recursos para facilitar el proceso de desarrollo. Las librerías HAL (Capa de abstracción de hardware), por ejemplo, contienen varias funciones implementadas con un mayor nivel de abstracción que permiten una codificación eficiente y son valiosas para este proyecto.
 
 <p align="center">
-<img src = "Docs/assets/hal-overview.png" width = 70%>
+<img src = "assets/hal-overview.png" width = 70%>
 </p>
 
 <p align="center">
@@ -386,7 +386,7 @@ Se han implementado dos funciones, para inicializar la prueba de cronoamperometr
 Para probar el rendimiento del potenciostato final se utilizó una solución de K3[Fe(CN)]<sub>-6</sub>, que se depositó en un electrodo serigrafiado conectado al microcontrolador. El montaje utilizado puede verse en la figura siguiente.
 
 <p align="center">
-<img align="center" src="Docs/assets/final_test.png" width="85%">
+<img align="center" src="assets/final_test.png" width="85%">
 </p>
 <p align="center">
 <i> Fig.5 - Prueba final del potenciostato. </i>
@@ -395,7 +395,7 @@ Para probar el rendimiento del potenciostato final se utilizó una solución de 
 Desgraciadamente, los valores de las medidas electroquímicas no fueron los esperados. Tanto en las pruebas de cronoamperometría como en las de voltamperometría cíclica, la temporización del sistema funcionó correctamente (frecuencia de muestreo, ciclos, tiempo de medición). Sin embargo, los valores mostrados en la interfaz gráfica no eran coherentes, mostrando oscilaciones inesperadas. No se pudo realizar la voltamperometría cíclica y, en consecuencia, tampoco la cronoamperometría.
 
 <p align="center">
-<img align="center" src="Docs/assets/result_CA.png" width="60%">
+<img align="center" src="assets/result_CA.png" width="60%">
 </p>
 <p align="center">
 <i> Fig.6 - Resultados de la cronoamperometría. </i>

@@ -4,11 +4,11 @@ students:
   - name: 'Álvaro Leva Ligero'
     email: 'levalvaro@gmail.com'
     linkedin: 'alvaroleva'
-    picture: 'Docs/assets/imgs/ALVARO-LEVA-LIGERO.jpg'
+    picture: 'assets/imgs/ALVARO-LEVA-LIGERO.jpg'
   - name: 'Guillermo Ruiz Carmona'
     email: 'guillermorc@gmail.com'
     linkedin: 'guillermo-ruiz-a665141a2'
-    picture: 'Docs/assets/imgs/GUILLERMO-RUIZ-CARMONA.jpg'
+    picture: 'assets/imgs/GUILLERMO-RUIZ-CARMONA.jpg'
 repo: 'https://github.com/Biomedical-Electronics/masbstat-arlevino_grc32'
 date: 2023-06-21
 language: 'en'
@@ -71,7 +71,7 @@ The potentiostat's front-end pins, which communicate with the microcontroller, a
 **[Chronoamperometry](https://en.wikipedia.org/wiki/Chronoamperometry)** makes use of an electrode excited by a voltage potential and is able to monitor the electrochemical reactions taking place in this electrode as a time-dependent current.
 
 <p align='center'>
-<img src='Docs/assets/Chronoamperometry.jpg'>
+<img src='assets/Chronoamperometry.jpg'>
 </p>
 
 <p align="center">
@@ -87,7 +87,7 @@ The analyte's diffusion across the sensor's surface affects how the [current cha
 In a [cyclic voltammetry](https://en.wikipedia.org/wiki/Cyclic_voltammetry), the potential at the *working electrode* changes linearly with time until a certain value, repeating this process multiple cycles. Finally, a cyclic graph is produced by plotting the electrode's current as a function of the applied potential.
 
 <p align='center'>
-<img src='Docs/assets/Cyclovoltammogram.jpg'>
+<img src='assets/Cyclovoltammogram.jpg'>
 </p>
 
 <p align="center">
@@ -129,7 +129,7 @@ The [STM32F401 Nucleo-64](https://www.st.com/en/evaluation-tools/nucleo-f401re.h
 
 
 <p align="center">
-<img src = "Docs/assets/EVB.png" width = 40%>
+<img src = "assets/EVB.png" width = 40%>
 </p>
 
 <p align="center">
@@ -146,7 +146,7 @@ The [STM32F401 Nucleo-64](https://www.st.com/en/evaluation-tools/nucleo-f401re.h
 STM32Cube IDE is an integrated development environment (IDE) specifically designed for programming and developing applications for STM32 microcontrollers. It provides a wide range of tools, features, and resources to ease the development process. HAL (Hardware Abstraction Layer) libraries, for instance, contain several implemented functions with higher level of abstraction that allow efficient coding and are valuable for this project. 
 
 <p align="center">
-<img src = "Docs/assets/hal-overview.png" width = 70%>
+<img src = "assets/hal-overview.png" width = 70%>
 </p>
 
 <p align="center">
@@ -387,7 +387,7 @@ Two functions have been implemented, to initialize the chronoamperometry test ``
 To test the performance of the final potentiostat a solution of K3[Fe(CN)]<sub>-6</sub> was deposited on a screen-printed electrode connected to the microcontroller. The used set up can be seen in the figure below. 
 
 <p align="center">
-<img align="center" src="Docs/assets/final_test.png" width="85%">
+<img align="center" src="assets/final_test.png" width="85%">
 </p>
 <p align="center">
 <i> Fig.5 - Final test of the potentiostat. </i>
@@ -396,7 +396,7 @@ To test the performance of the final potentiostat a solution of K3[Fe(CN)]<sub>-
 Unfortunately,the values of the electrochemical measures were not the expected ones. In both chronoamperometry and cyclic-voltammetry tests, the timing of the system worked correctly (sampling frequency, cycles, measurement time). However, the values displayed in the graphical interface were not consistent, showing unexpected oscillations. The cyclic voltammetry could not be done and, as a result, the chronoamperometry could not be achieved. 
 
 <p align="center">
-<img align="center" src="Docs/assets/result_CA.png" width="60%">
+<img align="center" src="assets/result_CA.png" width="60%">
 </p>
 <p align="center">
 <i> Fig.6 - Chronoamperometry results. </i>
